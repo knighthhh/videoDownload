@@ -11,10 +11,12 @@
 
 import multithreading
 import read
+import config
 
 def main():
     print('程序开始运行...')
     reader = read.ReadTxt()
+    config.ALL_ID = reader.read_all_video_id()
     mul = multithreading.Multithreading()
     toutiao_uid_list = reader.read_toutiao_uid()
     print(toutiao_uid_list)

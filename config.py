@@ -7,8 +7,7 @@ CHANGE_IP = 0
 #代理IP
 IP = ''
 
-#
-# executable_path = '/usr/local/Cellar/phantomjs/2.1.1/bin/phantomjs'
+ALL_ID = []
 
 START_URL = 'https://m.baidu.com/s?tn=zbios&bd_page_type=1&word={kw}'
 
