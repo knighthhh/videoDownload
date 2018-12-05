@@ -27,7 +27,6 @@ class Multithreading():
     def get_toutiao(self, item_list):
         for uid in item_list:
             start_url = 'https://www.365yg.com/c/user/article/?user_id={uid}&max_behot_time={pageToken}&max_repin_time=0&count=20&page_type=0'.format(uid=uid,pageToken='0')
-            print(start_url)
             response = self.down.get_html(start_url)
             if response:
                 json_obj = json.loads(response.text)
@@ -37,6 +36,7 @@ class Multithreading():
                     try:
                         videoid = data['item_id']
                         if videoid in config.ALL_ID:
+                            print(data['title']+'  已下载')
                             continue
                         image_url = data['image_url']
                         title = data['title']
@@ -44,8 +44,6 @@ class Multithreading():
                         write_path = self.make_dir('今日头条',username)
 
                         r = str(random.random())[3:]
-                        # origin_url = base64.b64decode(videoid).decode()
-                        # vid = re.findall('https?://toutiao.com/group/(\d+)/', origin_url)
                         detail_url = 'http://www.365yg.com/a{videoid}/'.format(videoid=videoid)
                         detail_response = self.down.get_html(detail_url)
                         find_videoId_res = re.findall(r"videoId: '(.*)'", detail_response.text)
@@ -98,8 +96,8 @@ class Multithreading():
         )
         p = multiprocessing.Pool(4)
         if appCode == 'toutiao':
-            # for arg in args:
-                p.apply_async(self.get_toutiao, args=args[0])
+            for arg in args:
+                p.apply_async(self.get_toutiao, args=arg)
         elif appCode == 'yidianzixun':
             for arg in args:
                 p.apply_async(self.get_yidian, args=arg)

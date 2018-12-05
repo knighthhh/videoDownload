@@ -19,7 +19,6 @@ def main():
     config.ALL_ID = reader.read_all_video_id()
     mul = multithreading.Multithreading()
     toutiao_uid_list = reader.read_toutiao_uid()
-    print(toutiao_uid_list)
     mul.start(toutiao_uid_list,'toutiao')
 
 
