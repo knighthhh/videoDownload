@@ -35,7 +35,7 @@ class Download(object):
             sleep(5)
             return self.get_ip(url)
 
-    def get_html(self,url):
+    def get_html(self,url,headers=config.HEADERS):
         if self.retry_num > config.ERROR_MAX:
             self.retry_num = 0
             print('请求出错次数大于最大出错次数，已终止')
@@ -47,12 +47,12 @@ class Download(object):
         }
         try:
             if config.COOKIES_SWITCH:
-                response = requests.get(url, headers=config.HEADERS, cookies=config.COOKIES, proxies=proxies)
+                response = requests.get(url, headers=headers, cookies=config.COOKIES, proxies=proxies)
             else:
                 if config.PROXY_SWITCH:
-                    response = requests.get(url, headers=config.HEADERS, proxies=proxies)
+                    response = requests.get(url, headers=headers, proxies=proxies)
                 else:
-                    response = requests.get(url, headers=config.HEADERS, verify=False)
+                    response = requests.get(url, headers=headers, verify=False)
             if response.status_code == 200:
                 return response
             return None
