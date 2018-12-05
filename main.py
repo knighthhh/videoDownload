@@ -19,11 +19,11 @@ def main():
     config.ALL_ID = reader.read_all_video_id()
     mul = multithreading.Multithreading()
 
-    # toutiao_uid_list = reader.read_toutiao_uid()
-    # mul.start(toutiao_uid_list,'toutiao')
+    toutiao_uid_list = reader.read_toutiao_uid()
+    mul.start(toutiao_uid_list,'toutiao')
 
-    yidianzixun_uid_list = reader.read_yidianzixun_uid()
-    mul.start(yidianzixun_uid_list,'yidianzixun')
+    # yidianzixun_uid_list = reader.read_yidianzixun_uid()
+    # mul.start(yidianzixun_uid_list,'yidianzixun')
 
 
 if __name__ == '__main__':

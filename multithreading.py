@@ -25,48 +25,63 @@ class Multithreading():
     def __init__(self):
         self.down = download.Download()
 
-    #今日头条
+    # 今日头条
     def get_toutiao(self, item_list):
+        now_timestamp = int(time.time())
         for uid in item_list:
-            start_url = 'https://www.365yg.com/c/user/article/?user_id={uid}&max_behot_time={pageToken}&max_repin_time=0&count=20&page_type=0'.format(uid=uid,pageToken='0')
-            response = self.down.get_html(start_url)
-            if response:
-                json_obj = json.loads(response.text)
-                for data in json_obj['data']:
-                    try:
-                        # 判断有没有爬取过
-                        videoid = data['item_id']
-                        if videoid in config.ALL_ID:
-                            print(data['title']+'  已下载')
-                            continue
-                        image_url = data['image_url']
-                        title = data['title']
-                        username = data['source']
+            flag = False  # 翻页标志
+            pageToken = '0'
+            for i in  range(0,20):
+                start_url = 'https://www.365yg.com/c/user/article/?user_id={uid}&max_behot_time={pageToken}&max_repin_time=0&count=20&page_type=0'.format(uid=uid,pageToken=pageToken)
+                response = self.down.get_html(start_url)
+                if response:
+                    json_obj = json.loads(response.text)
+                    for data in json_obj['data']:
+                        try:
+                            # 判断有没有爬取过
+                            videoid = data['item_id']
+                            if videoid in config.ALL_ID:
+                                print(data['title']+'  已下载')
+                                continue
+                            image_url = data['image_url']
+                            title = data['title']
+                            username = data['source']
+                            date_timestamp = data['behot_time']
 
-                        write_path = self.make_dir('今日头条',username)
-                        r = str(random.random())[3:]
-                        detail_url = 'http://www.365yg.com/a{videoid}/'.format(videoid=videoid)
-                        detail_response = self.down.get_html(detail_url)
-                        find_videoId_res = re.findall(r"videoId: '(.*)'", detail_response.text)
-                        if find_videoId_res:
-                            p = '/video/urls/v/1/toutiao/mp4/{}?r={}'.format(find_videoId_res[0], r)
-                            jscontext = execjs.compile(config.js_str)
-                            s = jscontext.call('getParam', p)
-                            down_video_url = 'http://ib.365yg.com/video/urls/v/1/toutiao/mp4/{}?r={}&s={}'.format(find_videoId_res[0], r, s)
-                            down_video_response = self.down.get_html(down_video_url)
-                            video_url = json.loads(down_video_response.text)['data']['video_list']['video_1']['main_url']
-                            video_url = base64.b64decode(video_url).decode()
-                            print('正在下载：'+title)
-                            urllib.request.urlretrieve(image_url, "%s.png" % os.path.join(write_path, title))
-                            urllib.request.urlretrieve(video_url, "%s.mp4" % os.path.join(write_path, title))
-                            with open('all_video_id.txt','a') as f:
-                                f.write(videoid+'\n')
-                        else:
-                            print('没有找到 加密的videoId')
-                    except:
-                        print('未知错误')
-            else:
-                print('获取页面数据失败')
+                            # 超过一周，不继续翻页
+                            if now_timestamp - date_timestamp > 60 * 60 * 24 * 7:
+                                flag = True
+                                break
+
+                            write_path = self.make_dir('今日头条',username)
+                            r = str(random.random())[3:]
+                            detail_url = 'http://www.365yg.com/a{videoid}/'.format(videoid=videoid)
+                            detail_response = self.down.get_html(detail_url)
+                            find_videoId_res = re.findall(r"videoId: '(.*)'", detail_response.text)
+                            if find_videoId_res:
+                                p = '/video/urls/v/1/toutiao/mp4/{}?r={}'.format(find_videoId_res[0], r)
+                                jscontext = execjs.compile(config.js_str)
+                                s = jscontext.call('getParam', p)
+                                down_video_url = 'http://ib.365yg.com/video/urls/v/1/toutiao/mp4/{}?r={}&s={}'.format(find_videoId_res[0], r, s)
+                                down_video_response = self.down.get_html(down_video_url)
+                                video_url = json.loads(down_video_response.text)['data']['video_list']['video_1']['main_url']
+                                video_url = base64.b64decode(video_url).decode()
+                                print('正在下载：'+title)
+                                urllib.request.urlretrieve(image_url, "%s.png" % os.path.join(write_path, title))
+                                urllib.request.urlretrieve(video_url, "%s.mp4" % os.path.join(write_path, title))
+                                with open('all_video_id.txt','a') as f:
+                                    f.write(videoid+'\n')
+                            else:
+                                print('没有找到 加密的videoId')
+                        except:
+                            print('未知错误')
+                    pageToken = str(json_obj['next']['max_behot_time'])
+
+                else:
+                    print('获取页面数据失败')
+
+            if flag:
+                break
 
     #一点资讯
     def get_yidian(self,item_list):
@@ -164,7 +179,7 @@ class Multithreading():
             for arg in args:
                 p.apply_async(self.get_toutiao, args=arg)
         elif appCode == 'yidianzixun':
-            # for arg in args:
-                p.apply_async(self.get_yidian, args=args[0])
+            for arg in args:
+                p.apply_async(self.get_yidian, args=arg)
         p.close()
         p.join()
