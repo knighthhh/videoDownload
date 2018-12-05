@@ -26,6 +26,7 @@ socket.setdefaulttimeout(30)
 class Multithreading():
     def __init__(self):
         self.down = download.Download()
+        multiprocessing.freeze_support()
 
     # 今日头条
     def get_toutiao(self, item_list):

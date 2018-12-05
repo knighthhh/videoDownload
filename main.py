@@ -13,6 +13,7 @@ import multithreading
 import read
 import config
 import time
+import multiprocessing
 
 def main():
     try:
@@ -35,6 +36,7 @@ if __name__ == '__main__':
     while True:
         print('程序开始运行...')
         print('当前时间：'+time.strftime('%Y-%m-%d %H:%M:%S',time.localtime()))
+        multiprocessing.freeze_support()
         main()
         print('本次已跑完！！')
         print('10分钟后重新跑。。。')
