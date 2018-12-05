@@ -20,6 +20,8 @@ import os
 import execjs
 import time
 import urllib.request
+import socket
+socket.setdefaulttimeout(30)
 
 class Multithreading():
     def __init__(self):
