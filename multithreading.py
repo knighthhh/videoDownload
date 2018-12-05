@@ -20,6 +20,7 @@ import os
 import execjs
 import time
 import urllib.request
+import read
 import socket
 socket.setdefaulttimeout(30)
 
@@ -27,6 +28,8 @@ class Multithreading():
     def __init__(self):
         self.down = download.Download()
         multiprocessing.freeze_support()
+        reader = read.ReadTxt()
+        self.all_id = reader.read_all_video_id()
 
     # 今日头条
     def get_toutiao(self, item_list):
@@ -43,7 +46,7 @@ class Multithreading():
                         try:
                             # 判断有没有爬取过
                             videoid = data['item_id']
-                            if videoid in config.ALL_ID:
+                            if videoid in self.all_id:
                                 print(data['title']+'  已下载')
                                 continue
                             image_url = data['image_url']
@@ -116,7 +119,7 @@ class Multithreading():
                         try:
                             if data['ctype'] == 'video_live':
                                 videoid = data['itemid']
-                                if videoid in config.ALL_ID:
+                                if videoid in self.all_id:
                                     print(data['title'] + '  已下载')
                                     continue
                                 image_url = 'http://i1.go2yd.com/image.php?url='+data['image']

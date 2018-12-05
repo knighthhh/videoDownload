@@ -18,7 +18,6 @@ import multiprocessing
 def main():
     try:
         reader = read.ReadTxt()
-        config.ALL_ID = reader.read_all_video_id()
         mul = multithreading.Multithreading()
 
         print('开始扫描今日头条。。')
